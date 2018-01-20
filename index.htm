@@ -68,17 +68,19 @@
 
     function defineVars() {
       min_size        = 24;                                 // largest possible shape size (px)
-      max_size        = 72;                                 // largest shape size
-      orig_size       = rndInt(min_size, max_size);         // 
-      padding         = orig_size * (1.5 + Math.random());  // 
-      size            = orig_size;                          // 
-      offset          = size * 0.25;                        // 
-      thick           = Math.sqrt(orig_size);               // 
-      chance_pattern  = 0.2;                                // 
+      max_size        = 72;                                 // largest possible shape size (px)
+      orig_size       = rndInt(min_size, max_size);         // pick a size between min and max
+      padding         = orig_size * (1.5 + Math.random());  // padding between shapes
+      size            = orig_size;                          // size for each shape, in relation to orig_size
+      offset          = size * 0.25;                        // offset for each shape in grid
+      thick           = Math.sqrt(orig_size);               // thickness of strokes
+      chance_pattern  = 0.2;                                // probability of a shape to have a stripped overlay
 
+      // force first pattern generated to be style #1 (of 2)
       if (stylize == -1) stylize = 0;
       else stylize = rndInt(0,1);
 
+      // define colors
       col_black   = "#141414";
       col_white   = "#FFFFFF";
       col_red     = "#FB4337";
@@ -87,6 +89,7 @@
       col_pink    = "#E397BE";
       col_teal    = "#6FCCC6";
 
+      // alternate color palette if alternate style
       if (stylize == 1) {
         col_black   = "#3D3D3D";
         col_white   = "#FDF1DB";
