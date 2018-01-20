@@ -6,7 +6,7 @@ Pattern generator inspired by the Memphis Group and 80s and 90s nostalgic geomet
 
 ## Authors
 
-* **Zack Banack** - *Initial work* - [zbanack](https://github.com/zbanack)
+* **Zack Banack** - *Initial work* - [zbanack](https://github.com/zbanack), [website](https://zackbanack.com)
 
 ## License
 
