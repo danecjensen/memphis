@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" value="text/html; charset=ISO-8859-1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Memphis Group Pattern Generator | 80s and 90s nostalgia wallpaper</title>
+    <meta property="og:title" content="Memphis Group Pattern Generator | 80s and 90s nostalgia wallpaper" />
+    <meta name="description" content="Memphis Group pattern generator, 80s and 90s nostalgia wallpaper" />
+    <meta property="og:description" content="Memphis Group pattern generator, 80s and 90s nostalgia wallpaper" />
+    <meta name="author" content="Zack Banack">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+  <style type="text/css">
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    border: 0;
+    overflow: hidden;
+    display: block;
+  }
+
+  #container {
+    position: relative;
+  }
+
+  #container canvas, #overlay {
+    position: absolute;
+  }
+
+  #overlay {
+    background-color:rgba(255, 255, 255, 0.75);
+    font-family: 'Raleway', sans-serif;
+    font-size:18px;
+    padding-left:24px;
+    padding-right:24px;
+    padding-bottom:24px;
+  }
+
+  a:link,a:active,a:visited {color: #303030; text-decoration: none;}
+  a:hover   {color: #000000; text-decoration: underline;}
+
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <canvas id="myCanvas" width="640" height="320" style="border:1px solid #d3d3d3;">
+  Your browser does not support the HTML5 canvas tag.
+  </canvas>
+    <div id="overlay">
+      <p><b>Memphis Group Pattern Generator</b><br><sub><a href="https://zackbanack.com" target="_blank">&#187; Zack Banack</a></sub></p>
+      <a id="rf" href="#">Generate</a>&nbsp;&bull;&nbsp;
+      <a id="dl" download="memphis.png" href="#">Download</a>&nbsp;&bull;&nbsp;
+      <a href="https://github.com/zbanack" target="_blank">Github</a>
+    </div>
+  </div>
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    /* Define variables */
+    var min_size, max_size, orig_size, padding, size, offset, thick, chance_pattern, xoff, yoff, xswap, yswap, rot, i, j, rnd_shape, prev_shape, ctx, col_black, col_white, col_red, col_blue, col_yellow, col_pink, col_teal = 0;
+    stylize = -1;
+
+    function defineVars() {
+      min_size        = 24;                                 // largest possible shape size (px)
+      max_size        = 72;                                 // largest shape size
+      orig_size       = rndInt(min_size, max_size);         // 
+      padding         = orig_size * (1.5 + Math.random());  // 
+      size            = orig_size;                          // 
+      offset          = size * 0.25;                        // 
+      thick           = Math.sqrt(orig_size);               // 
+      chance_pattern  = 0.2;                                // 
+
+      if (stylize == -1) stylize = 0;
+      else stylize = rndInt(0,1);
+
+      col_black   = "#141414";
+      col_white   = "#FFFFFF";
+      col_red     = "#FB4337";
+      col_blue    = "#1865B5";
+      col_yellow  = "#FFF85E";
+      col_pink    = "#E397BE";
+      col_teal    = "#6FCCC6";
+
+      if (stylize == 1) {
+        col_black   = "#3D3D3D";
+        col_white   = "#FDF1DB";
+        col_red     = "#FF95D1";
+        col_blue    = "#6FCDFB";
+        col_yellow  = "#69FFEB";    
+      }
+    }
+
+    /* Canvas reference and context */
+    var c = document.getElementById('myCanvas'),
+    context = c.getContext('2d');
+    init();
+
+    /* Initialization, canvas refresh and download listeners */
+    function init() {
+      /*
+        Have new pattern generate when the browser is resized
+        window.addEventListener('resize', redraw, false);
+      */
+      document.getElementById("rf").addEventListener('click', redraw, false);
+      document.getElementById("dl").addEventListener('click', dlCanvas, false);
+      redraw();
+    }
+
+    /* Redraw canvas */
+    function redraw() {
+      // update canvas width and size
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+      defineVars();   // redefine vals
+      clearCanvas();  // clear canvas
+      memphis();      // generate new pattern
+    }
+
+    /* Clear canvas */
+    function clearCanvas() {
+      // draw a white rectangle over the canvas
+      ctx = c.getContext("2d");
+      ctx.beginPath();
+      ctx.lineWidth = 0;
+      ctx.fillStyle = col_white;
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.closePath();
+    }
+
+    /*
+      Save cavas and initiate download (https://stackoverflow.com/a/12796748)
+      Elegant solution written by https://stackoverflow.com/users/1554114/nippey
+    */
+    function dlCanvas() {
+      var dt = myCanvas.toDataURL('image/png');
+      /* Change MIME type to trick the browser to downlaod the file instead of displaying it */
+      dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
+
+      /* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
+      dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=memphis.png');
+
+      this.href = dt;
+    };
+
+
+    /* Returns a random integer between min and max */
+    function rndInt(_min, _max) {
+      return Math.floor(Math.random() * (_max - _min + 1) + _min);
+    }
+
+    /* Returns the x or y coordinate that is the center of the circle @ (i, j) */
+    function circleGetCenter(_coord) {
+      switch(_coord) {
+        case("x"):
+          return (((orig_size + padding) * i) + orig_size * 0.5) + xoff - (size * 0.5);
+        break;
+        case("y"):
+          return (((orig_size + padding) * j) + orig_size * 0.5) + yoff - (size * 0.5);
+        break;
+      }
+    }
+
+    /* Returns the x or y coordinate that is the center of the square @ (i, j) */
+    function squareGetCenter(_coord) {
+      switch(_coord) {
+        case("x"):
+          return (((orig_size + padding) * i) + size * 0.5)  + xoff - (size * 0.5);
+        break;
+        case("y"):
+          return (((orig_size + padding) * j) + size * 0.5)  + yoff - (size * 0.5);
+        break;
+      }
+    }
+
+    /* Draw circle shape scaled at given x, y oddsets*/
+    function drawCircle(_shiftx, _shifty, _type, _scale) {
+      var center_x, center_y, _rad;
+      center_x = circleGetCenter("x") + _shiftx;
+      center_y = circleGetCenter("y") + _shifty;
+      _rad = orig_size * 0.5;
+
+      ctx.beginPath();
+      ctx.arc(center_x, center_y, _rad * _scale, 0, 2 * Math.PI);
+
+      // stroked or solid fill
+      switch(_type) {
+        case "stroke":
+          ctx.strokeStyle = col_black;
+          ctx.stroke();
+        break;
+        case "fill":
+          ctx.fillStyle = col_blue;
+          if (_scale < 1) ctx.fillStyle = col_black;
+          ctx.fill();
+        break;
+      }
+      ctx.closePath();
+    }
+
+    /* Draw square shape at given x, y offsets */
+    function drawSquare(_shiftx, _shifty, _type) {
+      var center_x, center_y, _len;
+      center_x = squareGetCenter("x") + (_shiftx);
+      center_y = squareGetCenter("y") + (_shifty);
+      _len = size;
+
+      // stroked or solid fill
+      switch(_type) {
+        case "stroke":
+          ctx.strokeStyle = col_black;
+          ctx.rect(center_x - (_len * 0.5), center_y - (_len * 0.5), _len, _len);
+          ctx.stroke();
+        break;
+        case "fill":
+          ctx.fillStyle = col_red;
+          ctx.fillRect(center_x - (_len * 0.5), center_y - (_len * 0.5), _len, _len);
+        break;
+      }
+
+    }
+
+    /* Draw triangle shape rotated at given x, y offsets */
+    function drawTriangle(_shiftx, _shifty, _type, _rot) {
+      var center_x, center_y, _len;
+      center_x = circleGetCenter("x") + _shiftx;
+      center_y = circleGetCenter("y") + _shifty;
+      _len = (size * 0.5);
+      ctx.save();
+      ctx.translate(center_x, center_y);
+      ctx.rotate(rot * (Math.PI / 180));
+      ctx.beginPath();
+      ctx.moveTo(0 - _len, 0 + _len);
+      ctx.lineTo(0 + _len, 0 + _len);
+      ctx.lineTo(0, 0 - _len);
+      ctx.lineTo(0 - _len, 0 + _len);
+      ctx.closePath();
+      ctx.restore();
+
+      // stroked or solid fill
+      switch(_type) {
+        case "stroke":
+          ctx.strokeStyle = col_black;
+          ctx.stroke();
+        break;
+        case "fill":
+          ctx.fillStyle = col_yellow;
+          ctx.fill();
+        break;
+      }
+
+    }
+
+    /* Draw stairs shape rotated at given x, y offsets */
+    function drawStairs(_shiftx, _shifty, _type, _rot) {
+      var center_x, center_y, _len;
+      center_x = circleGetCenter("x") + _shiftx;
+      center_y = circleGetCenter("y") + _shifty;
+      _len = (size * 0.25);
+      ctx.save();
+      ctx.translate(center_x, center_y);
+      ctx.rotate(rot * (Math.PI / 180));
+      ctx.beginPath();
+      ctx.moveTo(0 - _len - _len, 0 + _len);
+      ctx.lineTo(0 - _len, 0 + _len);
+      ctx.lineTo(0 - _len, 0);
+      ctx.lineTo(0, 0);
+      ctx.lineTo(0, 0 - _len);
+      ctx.lineTo(0 + _len, 0 - _len);
+      ctx.lineTo(0 + _len, 0 - (_len * 2));
+      
+      // stroked or solid fill
+      ctx.restore();
+      if (_type == "stroke") {
+        ctx.strokeStyle = col_black;
+        ctx.stroke();
+      }
+      else {
+        ctx.strokeStyle = col_pink;
+        ctx.stroke();
+      }
+    }
+
+    /* Draw line shape rotated at given x, y offsets */
+    function drawLines(_shiftx, _shifty, _type, _rot) {
+      var center_x, center_y, _len;
+      center_x = circleGetCenter("x") + _shiftx;
+      center_y = circleGetCenter("y") + _shifty;
+      _len = (size * 0.2);
+      ctx.save();
+      ctx.translate(center_x, center_y);
+      ctx.rotate(rot * (Math.PI / 180));
+      ctx.beginPath();
+      ctx.moveTo(0 - (_len * 3), 0 - (_len * 4));
+      ctx.lineTo(0 - (_len * 3), 0 + (_len * 4));
+      ctx.moveTo(0, 0 - (_len * 2));
+      ctx.lineTo(0, 0 + (_len * 6));
+      ctx.moveTo(0 + (_len * 3), 0 - (_len * 6));
+      ctx.lineTo(0 + (_len * 3), 0 + (_len * 2));
+      ctx.restore();
+
+      // stroked or solid fill
+      switch(_type) {
+        case "stroke":
+          ctx.strokeStyle = col_black;
+          ctx.stroke();
+        break;
+        case "fill":
+          ctx.strokeStyle = col_teal;
+          ctx.stroke();
+        break;
+      }
+    }
+
+    /* Draw X shape rotated at given x, y offsets */
+    function drawX(_shiftx, _shifty, _rot) {
+      var center_x, center_y, _len;
+      center_x = circleGetCenter("x") + _shiftx;
+      center_y = circleGetCenter("y") + _shifty;
+      _len = size / 2;
+      ctx.save();
+      ctx.translate(center_x, center_y);
+      ctx.rotate(_rot * (Math.PI / 180));
+      ctx.beginPath();
+      ctx.moveTo(0, 0 - _len);
+      ctx.lineTo(0, 0 + _len);
+      ctx.moveTo(0 - _len, 0);
+      ctx.lineTo(0 + _len, 0);
+      ctx.restore();
+      ctx.strokeStyle = col_black;
+      ctx.stroke();
+    }   
+
+    /* Draw an overlay stripe for a particular shape at given x, y offsets */
+    function drawStripe(_shiftx, _shifty, _side, _shape) {
+      var center_x, center_y, _inc;
+      _inc = 2;
+
+      // different center coordinates based on shape
+      switch(_shape) {
+        case "circle":
+          center_x = circleGetCenter("x") + _shiftx - (orig_size * 0.5);
+          center_y = circleGetCenter("y") + _shifty - (orig_size * 0.5);
+        break;
+        case "square":
+          center_x = squareGetCenter("x") + _shiftx - (orig_size * 0.5);
+          center_y = squareGetCenter("y") + _shifty - (orig_size * 0.5);
+        break;
+      }
+
+      if (_side == -1) center_y += orig_size;
+
+      ctx.beginPath();
+      ctx.moveTo(center_x - _inc, center_y - _inc);
+      ctx.lineTo(center_x + orig_size + _inc, center_y + (orig_size * _side) + _inc);
+      ctx.closePath();
+      ctx.strokeStyle = col_white;
+      ctx.stroke();
+    }
+
+    /* Create stripes used for overlaying */
+    function createStripes(shape) {
+      var side = -1;
+      if (Math.random() > 0.5) side = 1;
+      for (var k = 0; k <= orig_size; k += orig_size / 4) {
+        ctx = c.getContext("2d");
+        ctx.lineWidth = thick * 0.5;
+        drawStripe(0, -(orig_size * 0.5) + k, side, shape);
+      }
+    }
+
+    /* Iterate hor/vert through the canvas, placing random shapes with random attributes */
+    function memphis() {
+      for (i = 0; i < (myCanvas.width / (padding + size)); i++) {
+        for (j = 0; j < (myCanvas.height / (padding + size)); j++) {
+          // randomize size of element
+          size = (orig_size * 0.5) + (Math.random() * (orig_size * 0.5));
+
+          // randomize element coordinates within range
+          xoff = -(padding * 0.25) + ((padding * 0.5) * Math.random()) + (padding * 0.5);
+          yoff = -(padding * 0.25) + ((padding * 0.5) * Math.random()) + (padding * 0.5);
+
+          // random shadow direction (-1 or 1 for x and y)
+          xswap = (Math.round(Math.random()) * 2) - 1;
+          yswap = (Math.round(Math.random()) * 2) - 1;
+
+          // force next shape to be different than previous
+          do {
+            rnd_shape = (rndInt(0, 4));
+          }
+          while (prev_shape == rnd_shape);
+          prev_shape = rnd_shape;
+
+          switch (rnd_shape) {
+            case 0: // SQUARE
+              // solid
+              ctx = c.getContext("2d");
+              ctx.beginPath();
+              ctx.lineWidth = 0;
+              drawSquare(0, 0, "fill");
+              ctx.closePath();
+              if (Math.random() < 1 - chance_pattern) {
+                // stroke
+                ctx = c.getContext("2d");
+                ctx.beginPath();
+                ctx.lineWidth = thick;
+                drawSquare(offset * xswap, offset * yswap, "stroke");
+                ctx.closePath();
+              }
+              else {
+                createStripes("square"); // stripe overlay for square
+              }
+              break;
+            case 1: // CIRCLE
+              // solid
+              ctx = c.getContext("2d");
+              ctx.lineWidth = 0;
+              drawCircle(0, 0, "fill", 1);
+              if (Math.random() < 1 - chance_pattern) {
+                // stroke
+                ctx = c.getContext("2d");
+                ctx.lineWidth = thick;
+                drawCircle(offset * xswap, offset * yswap, "stroke", 1);
+              }
+              else {
+                createStripes("circle"); // stripe overlay for circle
+              }
+              break;
+            case 2: // TRIANGLE
+              // solid
+              rot = (rndInt(0, 3) * 90) + 20; // rotation
+              ctx = c.getContext("2d");
+              ctx.lineWidth = 0;
+              drawTriangle(0, 0, "fill", rot, i, j);
+              // stroke
+              ctx = c.getContext("2d");
+              ctx.lineWidth = thick;
+              drawTriangle(offset * xswap, offset * yswap, "stroke", rot);
+              break;
+            case 3: // STAIRS
+              switch(stylize) {
+                case 0:
+                  // solid
+                  rot = (rndInt(0, 7) * 45); // rotation
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = thick * 0.5;
+                  drawStairs(0, 0, "fill", rot);
+                  // stroke
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = thick * 0.5;
+                  drawStairs(offset * (xswap * 0.5), offset * (yswap * 0.5), "stroke", rot);
+                break;
+                case 1: // alternate style
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = 0;
+                  drawCircle(0, 0, "fill", 0.5);    
+                break;
+              }
+              break;
+            case 4: // LINE
+              switch(stylize){
+                case 0:
+                  // solid
+                  rot = (rndInt(0, 3) * 90); // rotation
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = thick * 0.5;
+                  drawLines(0, 0, "fill", rot);
+                  // stroke
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = thick * 0.5;
+                  drawLines(offset * (xswap * 0.5), offset * (yswap * 0.5), "stroke", rot);
+                break;
+                case 1: // alternative style
+                  rot = (rndInt(0, 1) * 45); // rotation
+                  ctx = c.getContext("2d");
+                  ctx.lineWidth = thick;
+                  drawX(0, 0, 45 + rot);
+                break;
+              }
+            break;
+          }
+        }
+      }
+    }
+  });
+  </script>
+</body>
+</html>
